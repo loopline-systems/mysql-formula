@@ -10,9 +10,9 @@
 {#-
 ===== COMBINE DATA =====
 -#}
-{%- set goodParamList = datamap.config.sections -%}
+{%- set goodParamList = datamap.server_config.sections -%}
 {%- for section_name in supported_sections -%}
-	{%- set sectdict = datamap.config.sections[section_name] | default({}) -%}
+	{%- set sectdict = datamap.server_config.sections[section_name] | default({}) -%}
 	{%- for mparam, mvalue in salt['pillar.get']('mysql:server:'+section_name, {}).items() -%}
 		{%- set mparamUnderscore = mparam | replace('-','_') -%}
 		{%- do sectdict.update({mparamUnderscore:mvalue}) -%}
@@ -30,17 +30,13 @@
 {%- set indents = 40 - mparam|count %}
 {% if mvalue == "noarg_present" -%}
 {{ mparam }}
-{%- else -%}
-{%- if mvalue is iterable and mvalue is not string -%}
-{%- for item in mvalue -%}
-{{ mparam }}{{ '='|indent(indents, true) }} {{ item }}
-{% endfor -%}
+{% elif mvalue == "SETONPLEASE"  %}
+{{ mparam }}{{ '='|indent(indents, true) }} ON
 {%- else -%}
 {{ mparam }}{{ '='|indent(indents, true) }} {{ mvalue }}
-{%- endif -%}
 {%- endif -%}
 {%- endfor -%}
 {%- endif -%}
 {%- endfor %}
 
-{{ datamap.config.append | default('') }}
+{{ datamap.server_config.append | default('') }}

@@ -8,15 +8,19 @@
 {% endmacro %}
 
 {% set mysql_dev = salt['pillar.get']('mysql:dev:install', False) %}
+{% set mysql_salt_user = salt['pillar.get']('mysql:salt_user:salt_user_name', False) %}
 
 include:
   - mysql.server
+{% if mysql_salt_user %}
+  - mysql.salt-user
+{% endif %}
   - mysql.database
   - mysql.user
 {% if mysql_dev %}
   - mysql.dev
 {% endif %}
-  
+
 
 {% if (db_states|length() + user_states|length()) > 0 %}
 extend:
